@@ -18,6 +18,7 @@ class Arbitrage(bt.Strategy):
 
         # Moving average of the spread to determine the baseline (mean-reverting assumption)
         self.spread_ma = bt.indicators.SimpleMovingAverage(self.price_spread, period=20)
+        self.stop_loss = int(input("Enter the stop loss: "))
         
     def next(self):
         # Calculate the current price spread
@@ -42,6 +43,9 @@ class Arbitrage(bt.Strategy):
         if abs(current_spread - mean_spread) < mean_spread * 0.01:  # Close if near mean spread
             self.close(data=self.datas[0])
             self.close(data=self.datas[1])
+
+        if self.broker.getvalue() < self.broker.get_cash() * (1 - (self.stop_loss / 100)):
+            self.close()
 
 def runStrategy():
     cerebro = bt.Cerebro()
