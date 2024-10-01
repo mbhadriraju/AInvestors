@@ -20,9 +20,9 @@ def index():
     if request.method == "POST":
         strat = request.form.get("strategy")
         if strat:
-            import hi  # Ensure this module exists and is correctly implemented
-            generated_code = hi.generate_strat_code(strat)
-            return render_template("index.html", strat=strat, generated_code=generated_code)
+            import main  # Ensure this module exists and is correctly implemented
+            strat_results = main.generate_strat_code(strat)
+            return render_template("index.html", strat=strat, generated_code=strat_results)
         else:
             return render_template("index.html", error="Strategy is required.")
     
