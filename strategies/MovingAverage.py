@@ -52,6 +52,7 @@ class MovingAverageStrategy(bt.Strategy):
         else:
             raise ValueError("Unknown strategy type")
         self.posize = positionSize
+        self.stop_loss = int(input("Enter the stop loss: "))
 
         
     def next(self):
@@ -61,6 +62,9 @@ class MovingAverageStrategy(bt.Strategy):
         else:
             if self.position.size * -1 < self.posize:
                 self.sell()
+        
+        if self.broker.getvalue() < self.broker.get_cash() * (1 - (self.stop_loss / 100)):
+            self.close()
                 
 def runStrategy():
     cerebro = bt.Cerebro()
