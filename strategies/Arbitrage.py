@@ -53,7 +53,7 @@ def runStrategy():
     bt_data1 = bt.feeds.PandasData(dataname=data1)
     cerebro.adddata(bt_data1)
 
-    data2 = yf.download("QQQ")
+    data2 = yf.download("NDAQ")
     bt_data2 = bt.feeds.PandasData(dataname=data2)
     cerebro.adddata(bt_data2)
 
