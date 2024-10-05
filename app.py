@@ -22,11 +22,11 @@ def index():
         if strat:
             import main  # Ensure this module exists and is correctly implemented
             strat_results = main.generate_strat_code(strat)
-            return render_template("index.html", strat=strat, generated_code=strat_results)
+            return render_template("templates/index.html", strat=strat, generated_code=strat_results)
         else:
-            return render_template("index.html", error="Strategy is required.")
+            return render_template("templates/index.html", error="Strategy is required.")
     
-    return render_template("index.html")
+    return render_template("templates/index.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
