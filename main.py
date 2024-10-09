@@ -69,4 +69,3 @@ def generate_strat_code(user_input):
         from strategies import MovingAverage as strat
         return strat.runStrategy()
       
-generate_strat_code(input("Strategy Type: "))  

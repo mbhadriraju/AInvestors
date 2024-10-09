@@ -36,8 +36,8 @@ class trendFollowingStrategy(bt.Strategy):
         if self.RSItest == True:
             self.rsi = bt.indicators.RSI(self.dataclose, period=self.short_period)
         if self.MACDtest == True:
-            self.macd = bt.indicators.MACD(self.dataclose, period_me1=int(input("Fast period: ")), 
-                                           period_me2=int(input("Long Period: ")), 
+            self.macd = bt.indicators.MACD(self.dataclose, period_me1=self.short_period, 
+                                           period_me2=self.long_period, 
                                            period_signal=int(input("Signal period: ")))
 
     def next(self):
@@ -71,7 +71,6 @@ class trendFollowingStrategy(bt.Strategy):
         # Global stop-loss check
         if self.broker.getvalue() < self.broker.get_cash() * (1 - (self.stoploss / 100)):
             self.close()
-            print('Stop loss triggered, closing all positions.')
 
 def runStrategy():
     cerebro = bt.Cerebro()
@@ -99,6 +98,7 @@ def runStrategy():
 
     # Return as a formatted string
     return f"""
+    Initial Cash: 1000
     Final Portfolio Value: {final_portfolio_value:.2f}
     Final Cash: {final_cash:.2f}
 
