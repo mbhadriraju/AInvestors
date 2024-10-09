@@ -2,28 +2,31 @@
 
 {% block head %}
     <title>AInvestors - Trading Strategy Input</title>
+    <link href="https://fonts.googleapis.com/css2?family=Afacad+Flux:wght@400;700&display=swap" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <h1 style="text-align: center">AInvestors</h1>
-    <h4 style="text-align: center">Enter your trading strategy</h4>
+    <h1 class="title">AInvestors</h1>
+    <h2 class="subtitle">Enter your trading strategy</h2>
+
     <div class="form">
         <form action="/" method="POST">
-            <input type="text" name="strategy" id="strategy" placeholder="Enter strategy here" required>
+            <textarea name="strategy" id="strategy" placeholder="Enter strategy here" rows="5" required></textarea>
             <input type="submit" value="Add Strategy">
         </form>
     </div>
 
-    {% if generated_code %}
-        <h2>Generated Code:</h2>
-        <pre>{{ generated_code }}</pre>
+    {% if metrics %}
+        <h2 class="subtitle">Strategy Metrics:</h2>
+        <textarea readonly rows="10">{{ metrics }}</textarea>
     {% endif %}
 
     {% if error %}
         <p style="color: red;">{{ error }}</p>
     {% endif %}
-    
-    <p><strong>Data:</strong> {{ strat }}</p>
+
+    <h2>Data:</h2>
+    {{ strat }}
 </div>
 {% endblock %}

@@ -1,0 +1,52 @@
+body, html {
+    margin: 0;
+    font-family: 'Afacad Flux', sans-serif;
+    background-color: lightblue;
+}
+
+.content {
+    margin: 0 auto;
+    width: max-content;
+}
+
+.title {
+    text-align: center;
+    font-size: 36px;
+    margin-top: 20px;
+}
+
+.subtitle {
+    text-align: center;
+    font-size: 24px;
+    margin-top: 20px;
+}
+
+.form {
+    margin-top: 20px;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+}
+
+input[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+textarea[readonly] {
+    background-color: #f5f5f5;
+    border: 1px solid #aaa;
+}
