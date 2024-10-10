@@ -21,7 +21,27 @@ def index():
         strat = request.form.get("strategy")
         if strat:
             import main  # Ensure this module exists and is correctly implemented
-            strat_results = main.generate_strat_code(strat)
+            strat_type = main.generate_strat(strat)
+            if strat_type == ["Arbitrage"]:
+                pass
+            elif strat_type == ["Breakout"]:
+                pass
+            elif strat_type == ["Contrarian"]:
+                pass
+            elif strat_type == ["Mean Reversion"]:
+                pass
+            elif strat_type == ["Momentum"]:
+                pass
+            elif strat_type == ["Moving Average"]:
+                pass
+            elif strat_type == ["Pairs"]:
+                pass
+            if strat_type == ["Relative Strength"]:
+                pass
+            else:
+                pass
+            params = ...
+            strat_results = main.generate_strat_code(strat_type, params)
             return render_template("index.html", strat=strat, metrics=strat_results)
         else:
             return render_template("index.html", error="Strategy is required.")
