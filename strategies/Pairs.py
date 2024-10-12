@@ -10,7 +10,7 @@ class Pairs(bt.Strategy):
         ('position_size', int(input("Enter the position size: "))) 
     )
 
-    def __init__(self):
+    def __init__(self, params):
         self.dataclose1 = self.datas[0].close
         self.dataclose2 = self.datas[1].close
         self.diff = self.dataclose1 - self.dataclose2  # Calculate the difference

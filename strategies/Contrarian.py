@@ -13,7 +13,7 @@ class Contrarian(bt.Strategy):
         ('rsi_overbought', int(input("Enter the RSI overbought threshold: ")))
     )
     
-    def __init__(self):
+    def __init__(self, params):
         # Mean Reversion Indicators
         self.dataclose = self.datas[0].close
         self.fast_ma = bt.indicators.SimpleMovingAverage(self.dataclose, period=self.p.fast_period)

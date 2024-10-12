@@ -2,7 +2,7 @@ import backtrader as bt
 import yfinance as yf
 
 class trendFollowingStrategy(bt.Strategy):
-    def __init__(self):
+    def __init__(self, params):
         while True:
             try:
                 bools = []

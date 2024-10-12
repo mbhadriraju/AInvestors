@@ -11,7 +11,7 @@ class RelativeStrength(bt.Strategy):
         ("long_only", input("Long Only? (True or False): ").strip() == 'True')
     )
     
-    def __init__(self):
+    def __init__(self, params):
         # Store the asset tickers
         self.assets = [asset.strip() for asset in self.p.assets]
         

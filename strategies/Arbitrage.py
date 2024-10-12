@@ -8,7 +8,7 @@ class Arbitrage(bt.Strategy):
         ("position_size", 10)        # Number of shares/contracts to trade
     )
     
-    def __init__(self):
+    def __init__(self, params):
         # Data for the two assets
         self.dataclose1 = self.datas[0].close  # Asset 1
         self.dataclose2 = self.datas[1].close  # Asset 2

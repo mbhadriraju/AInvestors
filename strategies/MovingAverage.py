@@ -5,7 +5,7 @@ import numpy as np
 import datetime
 
 class MovingAverageStrategy(bt.Strategy):
-    def __init__(self):
+    def __init__(self, params):
         self.dataclose = self.datas[0].close
         while True:
             try:

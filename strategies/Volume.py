@@ -8,7 +8,7 @@ class VolumeStrategy(bt.Strategy):
         ("period", int(input("Period: ")))
     )
     
-    def __init__(self):
+    def __init__(self, params):
         self.dataclose = self.datas[0].close
         self.datavol = self.datas[0].volume
         self.sma = bt.indicators.SimpleMovingAverage(self.dataclose, period=self.p.period)

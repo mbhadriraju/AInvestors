@@ -9,7 +9,7 @@ class breakout(bt.Strategy):
         ('stop_loss', int(input("Enter the stop loss: "))),
         ('position_size', int(input("Enter the position size: "))) 
     )
-    def __init__(self):
+    def __init__(self, params):
         self.dataclose = self.datas[0].close
         self.fast_ma = bt.indicators.SimpleMovingAverage(self.dataclose, period=self.p.fast_period)
         self.slow_ma = bt.indicators.SimpleMovingAverage(self.dataclose, period=self.p.slow_period)
