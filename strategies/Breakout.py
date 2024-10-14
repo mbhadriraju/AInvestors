@@ -2,26 +2,24 @@ import backtrader as bt
 import yfinance as yf
 
 class breakout(bt.Strategy):
-    params = (
-        ('deviation', float(input("Enter the Standard Deviation Factor: "))),
-        ('fast_period', int(input("Enter the fast moving average period (Enter 1 for current price): "))),
-        ('slow_period', int(input("Enter the slow moving average period: "))),
-        ('stop_loss', int(input("Enter the stop loss: "))),
-        ('position_size', int(input("Enter the position size: "))) 
-    )
     def __init__(self, params):
+        self.deviation = params[0]
+        self.fast_period = params[1]
+        self.slow_period = params[2]
+        self.stop_loss = params[3]
+        self.position_size = params[4]
         self.dataclose = self.datas[0].close
-        self.fast_ma = bt.indicators.SimpleMovingAverage(self.dataclose, period=self.p.fast_period)
-        self.slow_ma = bt.indicators.SimpleMovingAverage(self.dataclose, period=self.p.slow_period)
-        self.boll_bands = bt.indicators.BBands(self.dataclose, period=self.p.slow_period, devfactor=self.p.deviation, movav=self.slow_ma)
+        self.fast_ma = bt.indicators.SimpleMovingAverage(self.dataclose, period=self.fast_period)
+        self.slow_ma = bt.indicators.SimpleMovingAverage(self.dataclose, period=self.slow_period)
+        self.boll_bands = bt.indicators.BBands(self.dataclose, period=self.slow_period, devfactor=self.deviation, movav=self.slow_ma)
     def next(self):
         if self.fast_ma > self.boll_bands.top[-1]:
-            if self.position.size < self.p.position_size:
+            if self.position.size < self.position_size:
                 self.buy()
         elif self.fast_ma < self.boll_bands.bot[-1]:
-            if self.position.size * -1 < self.p.position_size:    
+            if self.position.size * -1 < self.position_size:    
                 self.sell()
-        if self.broker.getvalue() < self.broker.get_cash() * (1 - (self.p.stop_loss / 100)):
+        if self.broker.getvalue() < self.broker.get_cash() * (1 - (self.stop_loss / 100)):
             self.close()
 
             

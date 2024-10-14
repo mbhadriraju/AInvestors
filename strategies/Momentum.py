@@ -3,31 +3,15 @@ import yfinance as yf
 
 class trendFollowingStrategy(bt.Strategy):
     def __init__(self, params):
-        while True:
-            try:
-                bools = []
-                bools.append(bool(input("Enter 'True' or 'False' to add the RSI indicator: ")))
-                bools.append(bool(input("Enter 'True' or 'False' to add the MACD indicator: ")))
-                break
-            except ValueError:
-                print("Invalid input. Please enter 'True' or 'False'.")
-                continue
-        
-        stoploss = int(input("Enter the stop loss: "))
-        short_period = int(input("Enter the short moving average period: "))
-        long_period = int(input("Enter the long moving average period: "))
-        threshigh = int(input("Enter the upper threshold: "))
-        threshlow = int(input("Enter the lower threshold: "))
-        
-        self.RSItest = bools[0]
-        self.MACDtest = bools[1]
-        self.stoploss = stoploss
-        self.threshigh = threshigh
-        self.threshlow = threshlow
+        self.RSItest = params[0]
+        self.MACDtest = params[1]
+        self.stoploss = params[2]
+        self.threshigh = params[3]
+        self.threshlow = params[4]
         self.dataclose = self.datas[0].close
-        self.short_period = short_period
-        self.long_period = long_period
-        self.positionsize = int(input("Max position size: "))
+        self.short_period = params[5]
+        self.long_period = params[6]
+        self.positionsize = params[7]
         
         # Trend-following indicators (Moving Averages)
         self.short_ma = bt.indicators.SimpleMovingAverage(self.dataclose, period=self.short_period)

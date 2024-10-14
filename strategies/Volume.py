@@ -3,17 +3,14 @@ import yfinance as yf
 import numpy as np
 
 class VolumeStrategy(bt.Strategy):
-    params = (
-        ("position_size", int(input("Max position size: "))),
-        ("period", int(input("Period: ")))
-    )
-    
     def __init__(self, params):
         self.dataclose = self.datas[0].close
         self.datavol = self.datas[0].volume
-        self.sma = bt.indicators.SimpleMovingAverage(self.dataclose, period=self.p.period)
-        self.bollinger = bt.indicators.BollingerBands(self.dataclose, period=self.p.period, devfactor=2.0)
+        self.period = params[1]
+        self.sma = bt.indicators.SimpleMovingAverage(self.dataclose, period=self.period)
+        self.bollinger = bt.indicators.BollingerBands(self.dataclose, period=self.period, devfactor=2.0)
         self.obv = [0]  # Initialize OBV as a list to store the cumulative OBV
+        self.position_size = params[0]
 
     def next(self):
         # Calculate OBV (On-Balance Volume)
@@ -27,13 +24,13 @@ class VolumeStrategy(bt.Strategy):
         # Trading logic based on OBV and Bollinger Bands
         if self.obv[-1] > self.sma[0] and self.dataclose[0] > self.bollinger.lines.bot:
             if self.position.size == 0:
-                self.buy(size=self.p.position_size)
+                self.buy(size=self.position_size)
         elif self.obv[-1] < self.sma[0] and self.dataclose[0] < self.bollinger.lines.top:
             if self.position.size > 0:
-                self.sell(size=self.p.position_size)
+                self.sell(size=self.position_size)
 
         # Stop loss logic
-        if self.broker.getvalue() < self.broker.get_cash() * (1 - (self.p.position_size / 100)):
+        if self.broker.getvalue() < self.broker.get_cash() * (1 - (self.position_size / 100)):
             self.close()
 
 def runStrategy():
