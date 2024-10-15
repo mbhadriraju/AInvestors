@@ -7,36 +7,8 @@ import datetime
 class MovingAverageStrategy(bt.Strategy):
     def __init__(self, params):
         self.dataclose = self.datas[0].close
-        while True:
-            try:
-                period = int(input("Enter the number of months to calculate the long moving average: "))
-                if period < 1:
-                    raise ValueError
-                break
-            except ValueError:
-                print("Invalid input. Please enter a valid integer greater than 1.")
-                continue
-
-        while True:
-            try:
-                stratype = str(input("Enter the moving average type (sma, ema, dema, tema): "))
-                if stratype not in ["sma", "ema", "dema", "tema"]:
-                    raise ValueError
-                break
-            except ValueError:
-                print("Invalid input! Moving Average Type must be one of [sma,ema,dema,tema].")
-                continue
-            
-        while True:
-            try:
-                positionSize = int(input("Enter the max position size: "))
-                if positionSize < 1:
-                    raise ValueError
-                break
-            except ValueError:
-                print("Invalid input. Please enter a max position size that is an integer greater than 0.")
-                continue
-        period *= 21
+        period = params[0] * 21
+        stratype = params[1]     
         if stratype == "sma":
             self.ma = bt.indicators.SMA(self.dataclose, period=period)
             self.shortma = bt.indicators.SMA(self.dataclose, period=10)
@@ -51,8 +23,8 @@ class MovingAverageStrategy(bt.Strategy):
             self.shortma = bt.indicators.TripleExponentialMovingAverage(self.dataclose, period=10)
         else:
             raise ValueError("Unknown strategy type")
-        self.posize = positionSize
-        self.stop_loss = int(input("Enter the stop loss: "))
+        self.posize = params[2]
+        self.stop_loss = params[3]
 
         
     def next(self):

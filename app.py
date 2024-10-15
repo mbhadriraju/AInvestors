@@ -24,43 +24,61 @@ def index():
             strat_type = main.generate_strat(strat)
             if strat_type == ["Arbitrage"]:
                 params = [
-                    0.02,
-                    int(input("Max position size: "))
+                    "Spread Threshold: ",
+                    "Max position size: "
                 ]
             elif strat_type == ["Breakout"]:
                 params = [
-                    float(input("Enter the Standard Deviation Factor: ")),
-                    int(input("Enter the fast moving average period (Enter 1 for current price): ")),
-                    int(input("Enter the slow moving average period: ")),
-                    int(input("Enter the stop loss: ")),
-                    int(input("Enter the position size: "))
+                    "Enter the Standard Deviation Factor: ",
+                    "Enter the fast moving average period (Enter 1 for current price): ",
+                    "Enter the slow moving average period: ",
+                    "Enter the stop loss: ",
+                    "Enter the position size: "
                 ]
             elif strat_type == ["Contrarian"]:
                 params = [
-
+                    "Enter the Standard Deviation Factor: ",
+                    "Enter the fast moving average period (Enter 1 for current price): ",
+                    "Enter the slow moving average period: ",
+                    "Enter the stop loss: ",
+                    "Enter the position size: ",
+                    "Enter the RSI period: ",
+                    "Enter the RSI oversold threshold: ",
+                    "Enter the RSI overbought threshold: "
                 ]
             elif strat_type == ["Mean Reversion"]:
                 params = [
-                    
+                    "Enter the Standard Deviation Factor: ",
+                    "Enter the fast moving average period (Enter 1 for current price): ",
+                    "Enter the slow moving average period: ",
+                    "Enter the stop loss: ",
+                    "Enter the position size: "
                 ]
             elif strat_type == ["Momentum"]:
                 params = [
-                    bool(input("Enter 'True' or 'False' to add the RSI indicator: ")),
-                    bool(input("Enter 'True' or 'False' to add the MACD indicator: ")),
-                    int(input("Enter the stop loss: ")),
-                    int(input("Enter the upper threshold: ")),
-                    int(input("Enter the lower threshold: ")),
-                    int(input("Enter the short moving average period: ")),
-                    int(input("Enter the long moving average period: ")),
-                    int(input("Max position size: "))
+                    "Enter 'True' or 'False' to add the RSI indicator: ",
+                    "Enter 'True' or 'False' to add the MACD indicator: ",
+                    "Enter the stop loss: ",
+                    "Enter the upper threshold: ",
+                    "Enter the lower threshold: ",
+                    "Enter the short moving average period: ",
+                    "Enter the long moving average period: ",
+                    "Max position size: "
                 ]
             elif strat_type == ["Moving Average"]:
                 params = [
-                    
+                    "Enter the number of months to calculate the long moving average: ",
+                    "Enter the moving average type (sma, ema, dema, tema): ",
+                    "Enter the max position size: ",
+                    "Enter the stop loss: "
                 ]
             elif strat_type == ["Pairs"]:
                 params = [
-                    
+                    "Enter the Standard Deviation Factor: ",
+                    "Enter the fast moving average period (Enter 1 for current price): ",
+                    "Enter the slow moving average period: ",
+                    "Enter the stop loss: ",
+                    "Enter the position size: "
                 ]
             if strat_type == ["Relative Strength"]:
                 params = [
@@ -68,11 +86,11 @@ def index():
                 ]
             else:
                 params = [
-                    int(input("Max position size: ")), 
-                    int(input("Period: "))
+                    "Max position size: ", 
+                    "Period: "
                     ]
             
-            params = ...
+            params = [render_template("index.html", params=param) for param in params]
             strat_results = main.generate_strat_code(strat_type, params)
             return render_template("index.html", strat=strat, metrics=strat_results)
         else:
