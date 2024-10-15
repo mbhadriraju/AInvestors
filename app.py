@@ -82,7 +82,11 @@ def index():
                 ]
             if strat_type == ["Relative Strength"]:
                 params = [
-                    
+                    "Enter the lookback period (months): ",
+                    "Number of assets to hold (If long+short, your input will be doubled): ",
+                    "Enter the stop loss percentage: ",
+                    "Enter the ticker symbols of the assets (comma-separated): ",
+                    "Long Only? (True or False): "
                 ]
             else:
                 params = [
@@ -90,7 +94,7 @@ def index():
                     "Period: "
                     ]
             
-            params = [render_template("index.html", params=param) for param in params]
+            params = [request.form.get(param) for param in params]
             strat_results = main.generate_strat_code(strat_type, params)
             return render_template("index.html", strat=strat, metrics=strat_results)
         else:

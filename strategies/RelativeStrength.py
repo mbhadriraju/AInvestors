@@ -3,21 +3,18 @@ import backtrader as bt
 import numpy as np
 
 class RelativeStrength(bt.Strategy):
-    params = (
-        ("lookback", int(input("Enter the lookback period (months): "))),
-        ("numberHold", int(input("Number of assets to hold (If long+short, your input will be doubled): "))),
-        ("stopLoss", float(input("Enter the stop loss percentage: "))),
-        ("assets", input("Enter the ticker symbols of the assets (comma-separated): ").split(",")),
-        ("long_only", input("Long Only? (True or False): ").strip() == 'True')
-    )
-    
     def __init__(self, params):
+        self.lookback = params[0]
+        self.numberHold = params[1]
+        self.stopLoss = params[2]
+        self.assets = params[3].split(",")
+        self.long_only = params[4]
         # Store the asset tickers
-        self.assets = [asset.strip() for asset in self.p.assets]
+        self.assets = [asset.strip() for asset in self.assets]
         
         # Download data for each asset and store the close prices
         self.datacloses = [
-            np.log1p(yf.download(ticker)["Close"][self.p.lookback * -21:].pct_change().dropna()).to_numpy()
+            np.log1p(yf.download(ticker)["Close"][self.lookback * -21:].pct_change().dropna()).to_numpy()
             for ticker in self.assets
         ]
 
@@ -38,14 +35,14 @@ class RelativeStrength(bt.Strategy):
         sorted_assets = sorted(sharpe_dict.items(), key=lambda x: x[1], reverse=True)
         
         # Get the top assets based on the numberHold parameter
-        top_assets = [asset[0] for asset in sorted_assets[:self.p.numberHold]]
+        top_assets = [asset[0] for asset in sorted_assets[:self.numberHold]]
         
         # Trading logic
         for asset in self.assets:
             if asset in top_assets:
                 # If not already in position, enter the market
                 if not self.getpositionbyname(asset).size:
-                    if self.p.long_only:
+                    if self.long_only:
                         self.buy(data=self.getdatabyname(asset))
                     else:
                         self.buy(data=self.getdatabyname(asset)) if sharpe_dict[asset] > 0 else self.sell(data=self.getdatabyname(asset))
@@ -55,7 +52,7 @@ class RelativeStrength(bt.Strategy):
                     self.close(data=self.getdatabyname(asset))
 
         # Global stop-loss check
-        if self.broker.getvalue() < self.broker.get_cash() * (1 - self.p.stopLoss / 100):
+        if self.broker.getvalue() < self.broker.get_cash() * (1 - self.stopLoss / 100):
             self.close()
             print('Stop loss triggered, closing all positions.')
 

@@ -11,9 +11,9 @@ class Pairs(bt.Strategy):
         self.dataclose1 = self.datas[0].close
         self.dataclose2 = self.datas[1].close
         self.diff = self.dataclose1 - self.dataclose2  # Calculate the difference
-        self.fast_ma = bt.indicators.SimpleMovingAverage(self.diff, period=self.p.fast_period)
-        self.slow_ma = bt.indicators.SimpleMovingAverage(self.diff, period=self.p.slow_period)
-        self.boll_bands = bt.indicators.BBands(self.diff, period=self.p.slow_period, devfactor=self.p.deviation)
+        self.fast_ma = bt.indicators.SimpleMovingAverage(self.diff, period=self.fast_period)
+        self.slow_ma = bt.indicators.SimpleMovingAverage(self.diff, period=self.slow_period)
+        self.boll_bands = bt.indicators.BBands(self.diff, period=self.slow_period, devfactor=self.deviation)
 
     def next(self):
         # Calculate the latest values
@@ -24,15 +24,15 @@ class Pairs(bt.Strategy):
         # Check for buy signal
         if fast_ma_value < boll_bot_value:
             if not self.position:  # Check if not in position
-                self.buy(size=self.p.position_size)
+                self.buy(size=self.position_size)
 
         # Check for sell signal
         elif fast_ma_value > boll_top_value:
             if not self.position:  # Check if not in position
-                self.sell(size=self.p.position_size)
+                self.sell(size=self.position_size)
 
         # Global stop-loss check
-        if self.broker.getvalue() < self.broker.get_cash() * (1 - (self.p.stop_loss / 100)):
+        if self.broker.getvalue() < self.broker.get_cash() * (1 - (self.stop_loss / 100)):
             self.close()  # Close all positions if stop loss is triggered
 
 def runStrategy():
