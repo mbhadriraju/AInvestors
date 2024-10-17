@@ -38,7 +38,7 @@ class MovingAverageStrategy(bt.Strategy):
         if self.broker.getvalue() < self.broker.get_cash() * (1 - (self.stop_loss / 100)):
             self.close()
                 
-def runStrategy():
+def runStrategy(params):
     cerebro = bt.Cerebro()
     
 
@@ -46,7 +46,7 @@ def runStrategy():
     data = yf.download("SPY")
     bt_data = bt.feeds.PandasData(dataname=data)
     cerebro.adddata(bt_data)
-    cerebro.addstrategy(MovingAverageStrategy)
+    cerebro.addstrategy(MovingAverageStrategy(params))
     cerebro.addanalyzer(bt.analyzers.SharpeRatio, _name='mysharpe')
     cerebro.addanalyzer(bt.analyzers.AnnualReturn, _name='myret')
     cerebro.addanalyzer(bt.analyzers.SQN, _name='mysqn')

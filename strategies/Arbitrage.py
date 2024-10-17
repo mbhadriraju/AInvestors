@@ -43,7 +43,7 @@ class Arbitrage(bt.Strategy):
         if self.broker.getvalue() < self.broker.get_cash() * (1 - (self.stop_loss / 100)):
             self.close()
 
-def runStrategy():
+def runStrategy(params):
     cerebro = bt.Cerebro()
 
     cerebro.broker.set_cash(1000)
@@ -58,7 +58,7 @@ def runStrategy():
     cerebro.adddata(bt_data2)
 
     # Add the arbitrage strategy
-    cerebro.addstrategy(Arbitrage)
+    cerebro.addstrategy(Arbitrage(params))
 
     # Add analyzers
     cerebro.addanalyzer(bt.analyzers.SharpeRatio, _name='mysharpe')

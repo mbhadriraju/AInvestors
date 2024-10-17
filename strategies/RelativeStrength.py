@@ -57,16 +57,16 @@ class RelativeStrength(bt.Strategy):
             print('Stop loss triggered, closing all positions.')
 
 
-def runStrategy():
+def runStrategy(params):
     cerebro = bt.Cerebro()
     
 
     cerebro.broker.set_cash(1000)
-    strategy = RelativeStrength
+    strategy = RelativeStrength(params)
     for ticker in strategy.params.assets:
         data = bt.feeds.PandasData(dataname=yf.download(ticker, period=f'{strategy.params.lookback}d'))
         cerebro.adddata(data, name=ticker)
-    cerebro.addstrategy(RelativeStrength)
+    cerebro.addstrategy(strategy)
     cerebro.addanalyzer(bt.analyzers.SharpeRatio, _name='mysharpe')
     cerebro.addanalyzer(bt.analyzers.AnnualReturn, _name='myret')
     cerebro.addanalyzer(bt.analyzers.SQN, _name='mysqn')

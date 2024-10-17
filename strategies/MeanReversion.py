@@ -23,7 +23,7 @@ class meanreversion(bt.Strategy):
             self.close()
 
             
-def runStrategy():
+def runStrategy(params):
     cerebro = bt.Cerebro()
     
 
@@ -31,7 +31,7 @@ def runStrategy():
     data = yf.download("SPY")
     bt_data = bt.feeds.PandasData(dataname=data)
     cerebro.adddata(bt_data)
-    cerebro.addstrategy(meanreversion)
+    cerebro.addstrategy(meanreversion(params))
     cerebro.addanalyzer(bt.analyzers.SharpeRatio, _name='mysharpe')
     cerebro.addanalyzer(bt.analyzers.AnnualReturn, _name='myret')
     cerebro.addanalyzer(bt.analyzers.SQN, _name='mysqn')

@@ -35,7 +35,7 @@ class Pairs(bt.Strategy):
         if self.broker.getvalue() < self.broker.get_cash() * (1 - (self.stop_loss / 100)):
             self.close()  # Close all positions if stop loss is triggered
 
-def runStrategy():
+def runStrategy(params):
     cerebro = bt.Cerebro()
 
     cerebro.broker.set_cash(1000)
@@ -50,7 +50,7 @@ def runStrategy():
     cerebro.adddata(bt_data1)
     cerebro.adddata(bt_data2)
     
-    cerebro.addstrategy(Pairs)
+    cerebro.addstrategy(Pairs(params))
     cerebro.addanalyzer(bt.analyzers.SharpeRatio, _name='mysharpe')
     cerebro.addanalyzer(bt.analyzers.AnnualReturn, _name='myret')
     cerebro.addanalyzer(bt.analyzers.SQN, _name='mysqn')

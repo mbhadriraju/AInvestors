@@ -42,7 +42,7 @@ class Contrarian(bt.Strategy):
             self.close()
 
             
-def runStrategy():
+def runStrategy(params):
     cerebro = bt.Cerebro()
     
     cerebro.broker.set_cash(1000)
@@ -54,7 +54,7 @@ def runStrategy():
     cerebro.adddata(bt_data)
     
     # Add strategy to cerebro
-    cerebro.addstrategy(Contrarian)
+    cerebro.addstrategy(Contrarian(params))
     
     # Add analyzers
     cerebro.addanalyzer(bt.analyzers.SharpeRatio, _name='mysharpe')
@@ -86,5 +86,4 @@ def runStrategy():
     """
 
 
-# Run the strategy
-runStrategy()
+

@@ -56,7 +56,7 @@ class trendFollowingStrategy(bt.Strategy):
         if self.broker.getvalue() < self.broker.get_cash() * (1 - (self.stoploss / 100)):
             self.close()
 
-def runStrategy():
+def runStrategy(params):
     cerebro = bt.Cerebro()
     cerebro.broker.set_cash(1000)
 
@@ -64,7 +64,7 @@ def runStrategy():
     bt_data = bt.feeds.PandasData(dataname=data)
     cerebro.adddata(bt_data)
     
-    cerebro.addstrategy(trendFollowingStrategy)
+    cerebro.addstrategy(trendFollowingStrategy(params))
     
     cerebro.addanalyzer(bt.analyzers.SharpeRatio, _name='mysharpe')
     cerebro.addanalyzer(bt.analyzers.AnnualReturn, _name='myret')

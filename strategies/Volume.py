@@ -33,7 +33,7 @@ class VolumeStrategy(bt.Strategy):
         if self.broker.getvalue() < self.broker.get_cash() * (1 - (self.position_size / 100)):
             self.close()
 
-def runStrategy():
+def runStrategy(params):
     cerebro = bt.Cerebro()
 
     cerebro.broker.set_cash(1000)
@@ -41,7 +41,7 @@ def runStrategy():
     bt_data = bt.feeds.PandasData(dataname=data)
     cerebro.adddata(bt_data)
     
-    cerebro.addstrategy(VolumeStrategy)
+    cerebro.addstrategy(VolumeStrategy(params))
     
     # Add analyzers
     cerebro.addanalyzer(bt.analyzers.SharpeRatio, _name='mysharpe')
