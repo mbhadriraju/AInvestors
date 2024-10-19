@@ -4,11 +4,11 @@ import numpy as np
 
 class RelativeStrength(bt.Strategy):
     def __init__(self, params):
-        self.lookback = params[0]
-        self.numberHold = params[1]
-        self.stopLoss = params[2]
+        self.lookback = float(params[0])
+        self.numberHold = float(params[1])
+        self.stopLoss = float(params[2])
         self.assets = params[3].split(",")
-        self.long_only = params[4]
+        self.long_only = bool(params[4])
         # Store the asset tickers
         self.assets = [asset.strip() for asset in self.assets]
         

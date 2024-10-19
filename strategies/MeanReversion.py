@@ -3,11 +3,11 @@ import yfinance as yf
 
 class meanreversion(bt.Strategy):
     def __init__(self, params):
-        self.deviation = params[0]
-        self.fast_period = params[1]
-        self.slow_period = params[2]
-        self.stop_loss = params[3]
-        self.position_size = params[4]
+        self.deviation = float(params[0])
+        self.fast_period = float(params[1])
+        self.slow_period = float(params[2])
+        self.stop_loss = float(params[3])
+        self.position_size = float(params[4])
         self.dataclose = self.datas[0].close
         self.fast_ma = bt.indicators.SimpleMovingAverage(self.dataclose, period=self.fast_period)
         self.slow_ma = bt.indicators.SimpleMovingAverage(self.dataclose, period=self.slow_period)

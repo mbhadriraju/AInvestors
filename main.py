@@ -67,3 +67,5 @@ def generate_strat_code(predicted_strategy, params):
     if predicted_strategy == ["Moving Average"]:
         from strategies import MovingAverage as strat
         return strat.runStrategy(params)
+
+

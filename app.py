@@ -24,6 +24,7 @@ def index():
         if "strategy" in request.form:
             strat = request.form.get("strategy")
             if strat:
+                print("PRINT")
                 strat_type = main.generate_strat(strat)
                 params = get_params_for_strategy(strat_type)
                 return render_template("index.html", strat=strat, strat_type=strat_type, params=params)
@@ -32,9 +33,10 @@ def index():
         if "param_submit" in request.form:
             strat = request.form.get("strat")
             strat_type = request.form.get("strat_type")
-            params = {key: value for key, value in request.form.items() 
-                      if key not in ["param_submit", "strat", "strat_type"]}
+            params = [value for key, value in request.form.items()
+                      if key not in ["param_submit", "strat", "strat_type"]]
             strat_results = main.generate_strat_code(strat_type, params)
+            print(strat_results)
             return render_template("index.html", strat=strat, metrics=strat_results)
     return render_template("index.html")
 

@@ -5,10 +5,17 @@ import numpy as np
 import datetime
 
 class MovingAverageStrategy(bt.Strategy):
-    def __init__(self, params):
+    params = (
+        ('period', 24),
+        ('stratype', 'sma'),
+        ('posize', 1000),
+        ('stop_loss', 5),
+    )
+
+    def __init__(self):
         self.dataclose = self.datas[0].close
-        period = params[0] * 21
-        stratype = params[1]     
+        period = self.params.period * 21
+        stratype = self.params.stratype
         if stratype == "sma":
             self.ma = bt.indicators.SMA(self.dataclose, period=period)
             self.shortma = bt.indicators.SMA(self.dataclose, period=10)
@@ -23,30 +30,30 @@ class MovingAverageStrategy(bt.Strategy):
             self.shortma = bt.indicators.TripleExponentialMovingAverage(self.dataclose, period=10)
         else:
             raise ValueError("Unknown strategy type")
-        self.posize = params[2]
-        self.stop_loss = params[3]
 
-        
     def next(self):
         if self.shortma >= self.ma:
-            if self.position.size < self.posize:
+            if self.position.size < self.params.posize:
                 self.buy()
         else:
-            if self.position.size * -1 < self.posize:
+            if self.position.size * -1 < self.params.posize:
                 self.sell()
         
-        if self.broker.getvalue() < self.broker.get_cash() * (1 - (self.stop_loss / 100)):
+        if self.broker.getvalue() < self.broker.get_cash() * (1 - (self.params.stop_loss / 100)):
             self.close()
                 
 def runStrategy(params):
     cerebro = bt.Cerebro()
     
-
     cerebro.broker.set_cash(1000)
     data = yf.download("SPY")
     bt_data = bt.feeds.PandasData(dataname=data)
     cerebro.adddata(bt_data)
-    cerebro.addstrategy(MovingAverageStrategy(params))
+    cerebro.addstrategy(MovingAverageStrategy,
+                        period=int(params[0]),
+                        stratype=params[1],
+                        posize=int(params[2]),
+                        stop_loss=int(params[3]))
     cerebro.addanalyzer(bt.analyzers.SharpeRatio, _name='mysharpe')
     cerebro.addanalyzer(bt.analyzers.AnnualReturn, _name='myret')
     cerebro.addanalyzer(bt.analyzers.SQN, _name='mysqn')

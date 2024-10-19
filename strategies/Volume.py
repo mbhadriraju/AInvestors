@@ -6,11 +6,11 @@ class VolumeStrategy(bt.Strategy):
     def __init__(self, params):
         self.dataclose = self.datas[0].close
         self.datavol = self.datas[0].volume
-        self.period = params[1]
+        self.period = float(params[1])
         self.sma = bt.indicators.SimpleMovingAverage(self.dataclose, period=self.period)
         self.bollinger = bt.indicators.BollingerBands(self.dataclose, period=self.period, devfactor=2.0)
         self.obv = [0]  # Initialize OBV as a list to store the cumulative OBV
-        self.position_size = params[0]
+        self.position_size = float(params[0])
 
     def next(self):
         # Calculate OBV (On-Balance Volume)

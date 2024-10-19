@@ -7,8 +7,8 @@ class Arbitrage(bt.Strategy):
         # Data for the two assets
         self.dataclose1 = self.datas[0].close  # Asset 1
         self.dataclose2 = self.datas[1].close  # Asset 2
-        self.spread_threshold = params[0]
-        self.position_size = params[1]
+        self.spread_threshold = float(params[0])
+        self.position_size = int(params[1])
         # Calculate the price spread between the two assets
         self.price_spread = self.dataclose1 - self.dataclose2
 

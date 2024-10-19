@@ -2,46 +2,49 @@ import backtrader as bt
 import yfinance as yf
 
 class Contrarian(bt.Strategy):
-    def __init__(self, params):
-        self.deviation = params[0]
-        self.fast_period = params[1]
-        self.slow_period = params[2]
-        self.stop_loss = params[3]
-        self.position_size = params[4]
-        self.rsi_period = params[5]
-        self.rsi_oversold = params[6]
-        self.rsi_overbought = params[7]
+    params = (
+        ('deviation', 2),
+        ('fast_period', 10),
+        ('slow_period', 30),
+        ('stop_loss', 5),
+        ('position_size', 100),
+        ('rsi_period', 14),
+        ('rsi_oversold', 30),
+        ('rsi_overbought', 70),
+    )
+
+    def __init__(self):
         # Mean Reversion Indicators
         self.dataclose = self.datas[0].close
-        self.fast_ma = bt.indicators.SimpleMovingAverage(self.dataclose, period=self.fast_period)
-        self.slow_ma = bt.indicators.SimpleMovingAverage(self.dataclose, period=self.slow_period)
-        self.boll_bands = bt.indicators.BBands(self.dataclose, period=self.slow_period, devfactor=self.deviation, movav=self.slow_ma)
+        self.fast_ma = bt.indicators.SimpleMovingAverage(self.dataclose, period=self.params.fast_period)
+        self.slow_ma = bt.indicators.SimpleMovingAverage(self.dataclose, period=self.params.slow_period)
+        self.boll_bands = bt.indicators.BBands(self.dataclose, period=self.params.slow_period, 
+                                               devfactor=self.params.deviation, movav=self.slow_ma)
         
         # Contrarian RSI Indicator
-        self.rsi = bt.indicators.RelativeStrengthIndex(self.dataclose, period=self.rsi_period)
+        self.rsi = bt.indicators.RelativeStrengthIndex(self.dataclose, period=self.params.rsi_period)
     
     def next(self):
         # Mean Reversion Logic (Bollinger Bands)
         if self.fast_ma < self.boll_bands.bot[-1]:  # Buy signal when below lower Bollinger Band
-            if self.position.size < self.position_size:
+            if self.position.size < self.params.position_size:
                 self.buy()
         elif self.fast_ma > self.boll_bands.top[-1]:  # Sell signal when above upper Bollinger Band
-            if self.position.size * -1 < self.position_size:    
+            if self.position.size * -1 < self.params.position_size:    
                 self.sell()
 
         # Contrarian Logic (RSI)
-        if self.rsi < self.rsi_oversold:  # Buy signal when RSI indicates oversold
-            if self.position.size < self.position_size:
+        if self.rsi < self.params.rsi_oversold:  # Buy signal when RSI indicates oversold
+            if self.position.size < self.params.position_size:
                 self.buy()
-        elif self.rsi > self.rsi_overbought:  # Sell signal when RSI indicates overbought
-            if self.position.size * -1 < self.position_size:
+        elif self.rsi > self.params.rsi_overbought:  # Sell signal when RSI indicates overbought
+            if self.position.size * -1 < self.params.position_size:
                 self.sell()
 
         # Stop-loss mechanism
-        if self.broker.getvalue() < self.broker.get_cash() * (1 - (self.stop_loss / 100)):
+        if self.broker.getvalue() < self.broker.get_cash() * (1 - (self.params.stop_loss / 100)):
             self.close()
 
-            
 def runStrategy(params):
     cerebro = bt.Cerebro()
     
@@ -54,7 +57,15 @@ def runStrategy(params):
     cerebro.adddata(bt_data)
     
     # Add strategy to cerebro
-    cerebro.addstrategy(Contrarian(params))
+    cerebro.addstrategy(Contrarian,
+                        deviation=float(params[0]),
+                        fast_period=float(params[1]),
+                        slow_period=float(params[2]),
+                        stop_loss=float(params[3]),
+                        position_size=float(params[4]),
+                        rsi_period=float(params[5]),
+                        rsi_oversold=float(params[6]),
+                        rsi_overbought=float(params[7]))
     
     # Add analyzers
     cerebro.addanalyzer(bt.analyzers.SharpeRatio, _name='mysharpe')
@@ -85,5 +96,4 @@ def runStrategy(params):
     DrawDown: {drawdown}
     """
 
-
-
+# Example usage

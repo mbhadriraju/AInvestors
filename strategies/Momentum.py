@@ -3,11 +3,11 @@ import yfinance as yf
 
 class trendFollowingStrategy(bt.Strategy):
     def __init__(self, params):
-        self.RSItest = params[0]
-        self.MACDtest = params[1]
-        self.stoploss = params[2]
-        self.threshigh = params[3]
-        self.threshlow = params[4]
+        self.RSItest = bool(params[0])
+        self.MACDtest = bool(params[1])
+        self.stoploss = float(params[2])
+        self.threshigh = float(params[3])
+        self.threshlow = float(params[4])
         self.dataclose = self.datas[0].close
         self.short_period = params[5]
         self.long_period = params[6]

@@ -3,11 +3,11 @@ import yfinance as yf
 
 class Pairs(bt.Strategy):
     def __init__(self, params):
-        self.deviation = params[0]
-        self.fast_period = params[1]
-        self.slow_period = params[2]
-        self.stop_loss = params[3]
-        self.position_size = params[4]        
+        self.deviation = float(params[0])
+        self.fast_period = float(params[1])
+        self.slow_period = float(params[2])
+        self.stop_loss = float(params[3])
+        self.position_size = float(params[4])     
         self.dataclose1 = self.datas[0].close
         self.dataclose2 = self.datas[1].close
         self.diff = self.dataclose1 - self.dataclose2  # Calculate the difference
