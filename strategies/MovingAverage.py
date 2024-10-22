@@ -66,7 +66,7 @@ def runStrategy(params):
     sharpe_ratio = strat.analyzers.mysharpe.get_analysis()["sharperatio"]
     sqn = strat.analyzers.mysqn.get_analysis()["sqn"]
     drawdown = strat.analyzers.mydd.get_analysis()["drawdown"]
-
+    
     # Return as a formatted string
     return f"""
     Final Portfolio Value: {final_portfolio_value:.2f}

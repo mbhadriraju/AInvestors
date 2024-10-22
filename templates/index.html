@@ -23,7 +23,7 @@
     </div>
 
     {% if params %}
-        <h2 class="subtitle">Strategy Parameters:</h2>
+        <h2 class="subtitle">Strategy Parameters</h2>
         <form action="/" method="POST">
             {% for param in params %}
                 <label>{{ param }}</label>
@@ -32,11 +32,12 @@
             <input type="hidden" name="strat" value="{{ strat }}">
             <input type="hidden" name="strat_type" value="{{ strat_type }}">
             <input type="submit" name="param_submit" value="Run Strategy">
-        {% if metrics %}
-            <h2 class="subtitle">Strategy Metrics:</h2>
-            <textarea readonly rows="10" style="width: 100%;">{{ metrics }}</textarea>
-        {% endif %}
         </form>
+    {% endif %}
+    
+    {% if metrics %}
+        <h2 class="subtitle">Strategy Metrics</h2>
+        <textarea readonly rows="10" style="width: 100%;">{{ metrics }}</textarea>
     {% endif %}
 
 
