@@ -1,59 +1,60 @@
 import backtrader as bt
 import yfinance as yf
 
-class trendFollowingStrategy(bt.Strategy):
-    def __init__(self, params):
-        self.RSItest = bool(params[0])
-        self.MACDtest = bool(params[1])
-        self.stoploss = float(params[2])
-        self.threshigh = float(params[3])
-        self.threshlow = float(params[4])
+class momentum(bt.Strategy):
+    params = (
+        ('RSItest', True),
+        ('MACDtest', True),
+        ('stoploss', 5.0),
+        ('threshigh', 70),
+        ('threshlow', 30),
+        ('short_period', 10),
+        ('long_period', 30),
+        ('positionsize', 100),  # Size of the position in units of the asset's price
+    )
+    def __init__(self):
         self.dataclose = self.datas[0].close
-        self.short_period = params[5]
-        self.long_period = params[6]
-        self.positionsize = params[7]
-        
         # Trend-following indicators (Moving Averages)
-        self.short_ma = bt.indicators.SimpleMovingAverage(self.dataclose, period=self.short_period)
-        self.long_ma = bt.indicators.SimpleMovingAverage(self.dataclose, period=self.long_period)
+        self.short_ma = bt.indicators.SimpleMovingAverage(self.dataclose, period=self.params.short_period)
+        self.long_ma = bt.indicators.SimpleMovingAverage(self.dataclose, period=self.params.long_period)
 
-        if self.RSItest == True:
-            self.rsi = bt.indicators.RSI(self.dataclose, period=self.short_period)
-        if self.MACDtest == True:
-            self.macd = bt.indicators.MACD(self.dataclose, period_me1=self.short_period, 
-                                           period_me2=self.long_period, 
-                                           period_signal=int(input("Signal period: ")))
+        if self.params.RSItest == True:
+            self.rsi = bt.indicators.RSI(self.dataclose, period=self.params.short_period)
+        if self.params.MACDtest == True:
+            self.macd = bt.indicators.MACD(self.dataclose, period_me1=self.params.short_period, 
+                                           period_me2=self.params.long_period, 
+                                           period_signal=int((self.params.long_period + self.params.short_period) / 2))
 
     def next(self):
-        rsi_value = self.rsi[0] if self.RSItest else None
-        macd_value = self.macd[0] if self.MACDtest else None
-        macd_signal = self.macd.signal[0] if self.MACDtest else None
+        rsi_value = self.rsi[0] if self.params.RSItest else None
+        macd_value = self.macd[0] if self.params.MACDtest else None
+        macd_signal = self.macd.signal[0] if self.params.MACDtest else None
 
         # Trend-following buy signal: short MA crosses above long MA
         if self.short_ma > self.long_ma:
-            if self.position.size < self.positionsize:
+            if self.position.size < self.params.positionsize:
                 self.buy()
 
         # Trend-following sell signal: short MA crosses below long MA
         elif self.short_ma < self.long_ma:
-            if self.position.size * -1 < self.positionsize:
+            if self.position.size * -1 < self.params.positionsize:
                 self.sell()
 
         # Optional indicators (RSI/MACD)
-        if self.RSItest and rsi_value is not None:
-            if rsi_value > self.threshigh:
+        if self.params.RSItest and rsi_value is not None:
+            if rsi_value > self.params.threshigh:
                 self.sell()
-            elif rsi_value < self.threshlow:
+            elif rsi_value < self.params.threshlow:
                 self.buy()
 
-        if self.MACDtest and macd_value is not None and macd_signal is not None:
+        if self.params.MACDtest and macd_value is not None and macd_signal is not None:
             if macd_value > macd_signal:
                 self.buy()
             elif macd_value < macd_signal:
                 self.sell()
 
         # Global stop-loss check
-        if self.broker.getvalue() < self.broker.get_cash() * (1 - (self.stoploss / 100)):
+        if self.broker.getvalue() < self.broker.get_cash() * (1 - (self.params.stoploss / 100)):
             self.close()
 
 def runStrategy(params):
@@ -64,7 +65,15 @@ def runStrategy(params):
     bt_data = bt.feeds.PandasData(dataname=data)
     cerebro.adddata(bt_data)
     
-    cerebro.addstrategy(trendFollowingStrategy(params))
+    cerebro.addstrategy(momentum,
+                        RSItest=bool(params[0]),
+                        MACDtest=bool(params[1]),
+                        stoploss=float(params[2]),
+                        threshigh=int(params[3]),
+                        threshlow=int(params[4]),
+                        short_period=int(params[5]),
+                        long_period=int(params[6]),
+                        positionsize=int(params[7]))
     
     cerebro.addanalyzer(bt.analyzers.SharpeRatio, _name='mysharpe')
     cerebro.addanalyzer(bt.analyzers.AnnualReturn, _name='myret')

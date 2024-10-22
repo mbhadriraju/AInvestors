@@ -3,12 +3,14 @@ import yfinance as yf
 import numpy as np
 
 class Arbitrage(bt.Strategy):
-    def __init__(self, params):
+    params = (
+        ('spread_threshold', 0.05), 
+        ('position_size', 100),  
+    )
+    def __init__(self):
         # Data for the two assets
         self.dataclose1 = self.datas[0].close  # Asset 1
         self.dataclose2 = self.datas[1].close  # Asset 2
-        self.spread_threshold = float(params[0])
-        self.position_size = int(params[1])
         # Calculate the price spread between the two assets
         self.price_spread = self.dataclose1 - self.dataclose2
 
@@ -22,18 +24,18 @@ class Arbitrage(bt.Strategy):
         mean_spread = self.spread_ma[0]
         
         # Check if the spread has deviated significantly from the mean
-        if current_spread > mean_spread * (1 + self.spread_threshold):
+        if current_spread > mean_spread * (1 + self.params.spread_threshold):
             # If the spread is too high, sell the more expensive asset (1) and buy the cheaper asset (2)
             if not self.getposition(self.datas[0]).size:  # No position in Asset 1
-                self.sell(data=self.datas[0], size=self.position_size)  # Short Asset 1
+                self.sell(data=self.datas[0], size=self.params.position_size)  # Short Asset 1
             if not self.getposition(self.datas[1]).size:  # No position in Asset 2
-                self.buy(data=self.datas[1], size=self.position_size)   # Long Asset 2
-        elif current_spread < mean_spread * (1 - self.spread_threshold):
+                self.buy(data=self.datas[1], size=self.params.position_size)   # Long Asset 2
+        elif current_spread < mean_spread * (1 - self.params.spread_threshold):
             # If the spread is too low, buy the more expensive asset (1) and sell the cheaper asset (2)
             if not self.getposition(self.datas[0]).size:
-                self.buy(data=self.datas[0], size=self.position_size)  # Long Asset 1
+                self.buy(data=self.datas[0], size=self.params.position_size)  # Long Asset 1
             if not self.getposition(self.datas[1]).size:
-                self.sell(data=self.datas[1], size=self.position_size)  # Short Asset 2
+                self.sell(data=self.datas[1], size=self.params.position_size)  # Short Asset 2
         
         # Exit strategy: close positions when the spread reverts back to the mean
         if abs(current_spread - mean_spread) < mean_spread * 0.01:  # Close if near mean spread
@@ -58,7 +60,9 @@ def runStrategy(params):
     cerebro.adddata(bt_data2)
 
     # Add the arbitrage strategy
-    cerebro.addstrategy(Arbitrage(params))
+    cerebro.addstrategy(Arbitrage, 
+                        spread_threshold=float(params[0]),
+                        position_size=int(params[1]))
 
     # Add analyzers
     cerebro.addanalyzer(bt.analyzers.SharpeRatio, _name='mysharpe')
