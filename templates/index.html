@@ -18,7 +18,7 @@
 
         <div class="form">
             <form action="/" method="POST" onsubmit="disableButton()">
-                <textarea name="strategy" id="strategy" placeholder="Enter strategy here" rows="5" required></textarea>
+                <textarea name="strategy" id="strategy" placeholder="Enter strategy here" rows="5" cols="40" required></textarea>
                 <input type="submit" value="Add Strategy" id="addStrategyBtn">
             </form>
         </div>
@@ -39,7 +39,7 @@
     
     {% if metrics %}
         <h2 class="subtitle">Strategy Metrics</h2>
-        <textarea readonly rows="10" style="width: 100%;">{{ metrics }}</textarea>
+        <textarea readonly rows="20" cols="80">{{ metrics }}</textarea>
     {% endif %}
 
 

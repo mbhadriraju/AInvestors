@@ -90,5 +90,3 @@ def runStrategy(params):
 
     DrawDown: {drawdown}
     """
-
-print(runStrategy([24,'sma', 1000, 5]))
