@@ -74,16 +74,28 @@ def runStrategy(params):
     sharpe_ratio = strat.analyzers.mysharpe.get_analysis()["sharperatio"]
     sqn = strat.analyzers.mysqn.get_analysis()["sqn"]
     drawdown = strat.analyzers.mydd.get_analysis()["drawdown"]
-
+    total = 0
+    count = 0
+    for key, value in annual_return.items():
+        total += value
+        count += 1
+    
+    total /= count
+    total += 1
     # Return as a formatted string
     return f"""
+    Initial Cash: 1000
+
     Final Portfolio Value: {final_portfolio_value:.2f}
+
     Final Cash: {final_cash:.2f}
 
-    Annual Return: {annual_return}
+    Annual Return: {total}
 
     Sharpe Ratio: {sharpe_ratio}
+
     SQN: {sqn}
+
     DrawDown: {drawdown}
     """
 
