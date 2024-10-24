@@ -43,6 +43,7 @@ def index():
                 # Preprocess the user input using the trained vectorizer
                 user_input_transformed = vectorizer.transform([strat]) 
                 strat_type = rfmod.predict(user_input_transformed) 
+                print(strat_type)
                 params = get_params_for_strategy(strat_type)
                 return render_template("index.html", strat=strat, strat_type=strat_type, params=params)
             else:
