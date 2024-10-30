@@ -1,10 +1,14 @@
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
+import torch
+from torch import nn
+from torch.utils.data import DataLoader, Dataset
 from datetime import datetime
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
+from transformers import BertTokenizer, BertModel, AdamW, get_linear_schedule_with_warmu
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
@@ -27,7 +31,16 @@ def index():
         if "strategy" in request.form:
             strat = request.form.get("strategy")
             if strat:
+                def loadData(csv):
+                    df = pd.read_csv(csv)
+                    descriptions = df["Description"].tolist()
+                    arr = ["Arbitrage", "Breakout", "Contrarian", "Mean Reversion", "Momentum", "Moving Average", "Pairs", "Relative Strength", "Volume Based"]
+                    types = []
+                    for type in df["Type"].tolist():
+                        types.append([1 if type == arr[i] else 0 for i in range(len(arr))])
+                    return descriptions, types
                 data = pd.read_csv("database/StratDescriptions.csv")
+                descriptions, types = loadData("database/StratDescriptions.csv")
                 # Initialize TF-IDF Vectorizer
                 vectorizer = TfidfVectorizer(stop_words='english', max_df=0.7)
                 # Transform the text data to feature vectors
