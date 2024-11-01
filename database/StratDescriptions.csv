@@ -1,4 +1,4 @@
-Description,Type,
+Description, Label,
 A strategy that buys when others are selling and sells when others are buying,Contrarian,
 A strategy that buys the underperforming stock and shorts the overperforming one,Pairs,
 A strategy that finds arbitrage opportunities across related securities or markets,Arbitrage,
