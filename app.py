@@ -7,8 +7,9 @@ from datetime import datetime
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, classification_report
 from sklearn.feature_extraction.text import TfidfVectorizer
-from transformers import BertTokenizer, BertModel, AdamW, get_linear_schedule_with_warmu
+from transformers import BertTokenizer, BertModel, AdamW, get_linear_schedule_with_warmup
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
@@ -31,14 +32,112 @@ def index():
         if "strategy" in request.form:
             strat = request.form.get("strategy")
             if strat:
+                #Method to load data and return descriptions with their appropriate labels.
                 def loadData(csv):
                     df = pd.read_csv(csv)
                     descriptions = df["Description"].tolist()
                     arr = ["Arbitrage", "Breakout", "Contrarian", "Mean Reversion", "Momentum", "Moving Average", "Pairs", "Relative Strength", "Volume Based"]
-                    types = []
-                    for type in df["Type"].tolist():
-                        types.append([1 if type == arr[i] else 0 for i in range(len(arr))])
-                    return descriptions, types
+                    labels = []
+                    for label in df["Label"].tolist():
+                        labels.append([1 if label == arr[i] else 0 for i in range(len(arr))])
+                    return descriptions, labels
+                #A TextClassificationDataset object with special attributes for ease of classification.
+                class TextClassificationDataset(Dataset):
+                    def __init__(self, descriptions, labels, tokenizer, max_length):
+                        self.descriptions = descriptions
+                        self.labels = labels
+                        self.tokenizer = tokenizer
+                        self.max_length = max_length
+                    def __len__(self):
+                        return len(self.descriptions)
+                    def __getitem__(self, idx):
+                        description = self.descriptions[idx]
+                        label = self.labels[idx]
+                        encoding = self.tokenizer(description, return_tensors='pt', max_length=self.max_length, padding='max_length', truncation=True)
+                        return {'input_ids': encoding['input_ids'].flatten(), 'attention_mask': encoding['attention_mask'].flatten(), 'label': torch.tensor(label)}
+                #An object that classifies using BERT
+                class BERTClassifier(nn.Module):
+                    def __init__(self, bert_model_name, num_classes):
+                        super(BERTClassifier, self).__init__()
+                        self.bert = BertModel.from_pretrained(bert_model_name)
+                        self.dropout = nn.Dropout(0.1)
+                        self.fc = nn.Linear(self.bert.config.hidden_size, num_classes)
+                    def forward(self, input_ids, attention_mask):
+                            outputs = self.bert(input_ids, attention_mask)
+                            pooled_output = outputs.pooler_output
+                            x = self.dropout(pooled_output)
+                            logits = self.fc(x)
+                            return logits
+                #A function that trains the model and uses the optimizer to perform gradient descent. 
+                def train(model, data_loader, optimizer, scheduler, device):
+                    model.train()
+                    for batch in data_loader:
+                        optimizer.zero_grad()
+                        input_ids = batch['input_ids'].to(device)
+                        attention_mask = batch['attention_mask'].to(device)
+                        labels = batch['label'].to(device)
+                        outputs = model.forward(input_ids, attention_mask)
+                        loss = nn.CrossEntropyLoss()(outputs, labels)
+                        loss.backward()
+                        optimizer.step()
+                        scheduler.step()
+                #A function that evaluates the model performance
+                def evaluate(model, data_loader, device):
+                    model.eval()
+                    predictions = []
+                    actual_labels = []
+                    with torch.no_grad():
+                        for batch in data_loader:
+                            input_ids = batch['input_ids'].to(device)
+                            attention_mask = batch['attention_mask'].to(device)
+                            labels = batch['label'].to(device)
+                            outputs = model(input_ids=input_ids, attention_mask=attention_mask)
+                            _, preds = torch.max(outputs, dim=1)
+                            predictions.extend(preds.cpu().tolist())
+                            actual_labels.extend(labels.cpu().tolist())
+                    return accuracy_score(actual_labels, predictions), classification_report(actual_labels, predictions)
+                #The final function that predicts the strategy with the text and trained model.
+                def predict_strat(text, model, tokenizer, device, max_length=128):
+                    model.eval()
+                    encoding = tokenizer(text, return_tensors='pt', max_length=max_length, padding='max_length', truncation=True)
+                    input_ids = encoding['input_ids'].to(device)
+                    attention_mask = encoding['attention_mask'].to(device)
+
+                    with torch.no_grad():
+                        outputs = model(input_ids=input_ids, attention_mask=attention_mask)
+                        _, preds = torch.max(outputs, dim=1)
+                    arr = ["Arbitrage", "Breakout", "Contrarian", "Mean Reversion", "Momentum", "Moving Average", "Pairs", "Relative Strength", "Volume Based"]
+                    test = preds.item()
+                    for i in range(len(test)):
+                        if test[i] == 1:
+                            return arr[i]
+                bert_model_name = 'bert-base-uncased'
+                num_classes = 2
+                max_length = 128
+                batch_size = 16
+                num_epochs = 4
+                learning_rate = 2e-5
+                descriptions, labels = loadData("database/StratDescriptions.csv")
+                train_descriptions, val_texts, train_labels, val_labels = train_test_split(descriptions, labels, test_size=0.2, random_state=42)
+                tokenizer = BertTokenizer.from_pretrained(bert_model_name)
+                train_dataset = TextClassificationDataset(train_descriptions, train_labels, tokenizer, max_length)
+                val_dataset = TextClassificationDataset(val_texts, val_labels, tokenizer, max_length)
+                train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+                val_dataloader = DataLoader(val_dataset, batch_size=batch_size)
+                device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+                model = BERTClassifier(bert_model_name, num_classes).to(device)
+                optimizer = AdamW(model.parameters(), lr=learning_rate)
+                total_steps = len(train_dataloader) * num_epochs
+                scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=total_steps)
+                for epoch in range(num_epochs):
+                    print(f"Epoch {epoch + 1}/{num_epochs}")
+                    train(model, train_dataloader, optimizer, scheduler, device)
+                    accuracy, report = evaluate(model, val_dataloader, device)
+                    print(f"Validation Accuracy: {accuracy:.4f}")
+                    print(report)
+                torch.save(model.state_dict(), "bert_classifier.pth")
+                strat_type = predict_strat(strat, model, tokenizer, device)
+                '''
                 data = pd.read_csv("database/StratDescriptions.csv")
                 descriptions, types = loadData("database/StratDescriptions.csv")
                 # Initialize TF-IDF Vectorizer
@@ -57,6 +156,7 @@ def index():
                 user_input_transformed = vectorizer.transform([strat]) 
                 strat_type = rfmod.predict(user_input_transformed) 
                 print(strat_type)
+                '''
                 params = get_params_for_strategy(strat_type)
                 return render_template("index.html", strat=strat, strat_type=strat_type, params=params)
             else:
