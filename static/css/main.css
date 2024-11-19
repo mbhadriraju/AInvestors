@@ -29,6 +29,7 @@ textarea {
     display: block;
     margin-left: auto;
     margin-right: auto;
+    margin-bottom: 20px;
     resize: none;
     font-size: 18px;
     text-align: center;
@@ -50,4 +51,11 @@ input[type="submit"]:hover {
 textarea[readonly] {
     background-color: #f5f5f5;
     border: 1px solid #aaa;
+}
+
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
 }

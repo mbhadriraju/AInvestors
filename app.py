@@ -25,9 +25,8 @@ class Strategy(db.Model):
     def __repr__(self):
         return f'<Strategy {self.name}>'
 
-@app.route("/", methods=["GET", "POST"])
-@app.route("/", methods=["GET", "POST"])
-def index():
+@app.route("/model", methods=["GET", "POST"])
+def model():
     if request.method == "POST":
         if "strategy" in request.form:
             strat = request.form.get("strategy")
@@ -51,9 +50,9 @@ def index():
                 strat_type = rfmod.predict(user_input_transformed) 
                 print(strat_type)
                 params = get_params_for_strategy(strat_type)
-                return render_template("index.html", strat=strat, strat_type=strat_type, params=params)
+                return render_template("model.html", strat=strat, strat_type=strat_type, params=params)
             else:
-                return render_template("index.html", error="Strategy is required.")
+                return render_template("model.html", error="Strategy is required.")
         if "param_submit" in request.form:
             strat = request.form.get("strat")
             strat_type = request.form.get("strat_type")
@@ -94,8 +93,20 @@ def index():
             if strat_type == "['Moving Average']":
                 from strategies import MovingAverage as strategy
                 strat_results = strategy.runStrategy(params)
-            return render_template("index.html", strat=strat, metrics=strat_results)
+            return render_template("model.html", strat=strat, metrics=strat_results)
+    return render_template("model.html")
+
+@app.route("/", methods=["GET", "POST"])
+def home():
     return render_template("index.html")
+
+@app.route("/pricing", methods=["GET", "POST"])
+def pricing():
+    return render_template("pricing.html")
+
+@app.route("/about", methods=["GET", "POST"])
+def about():
+    return render_template("about.html")
 
 def get_params_for_strategy(strat_type):
     params_dict = {
