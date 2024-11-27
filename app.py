@@ -10,11 +10,10 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
-# Initialize database
+# Database + Strategy for future addons to improve user experience.
 with app.app_context():
     db.create_all()
 
-# Example strategy model
 class Strategy(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
