@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>AInvestors - Trading Strategy Input</title>
+    <link href="https://fonts.googleapis.com/css2?family=Afacad+Flux:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        function disableButton() {
+            document.getElementById("addStrategyBtn").disabled = true;
+        }
+    </script>
+{% endblock %}
+
+{% block body %}
+<div class="topnav">
+    <a href="/">Home</a></li>
+    <a href="/about">About</a></li>
+    <a href="/pricing">Pricing</a></li>
+    <a href="/model">Model</a></li>
+    ><a href="/signup">Login</a></li>
+</div>
+
+<div class="content">
+    <h1 class="title">AInvestors</h1>
+</div>
+{% if not login %}
+<div class="form">
+    <form class="form" id="auth-form" action="{{url_for('login')}}" method="post">
+        <span class="subtitle">Login with your email and password.</span>
+        <div class="form-container">
+            <input type="email" name="Email" class="input" placeholder="Email">
+                <input type="password" name="Password" class="input" placeholder="Password">
+        </div>
+        <button>Log in</button>
+    </form>
+    <div class="form-section">
+      <p>Don't have an account? <a href="/signup">Sign Up</a> </p>
+    </div>
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+{% endif %}
+{% if login %}
+<h2 style="color: red; text-align: center;" class="subtitle">You are already logged in, you may go to another page or use our model</h2>
+{% endif %}
+</div>
+{% endblock %}
